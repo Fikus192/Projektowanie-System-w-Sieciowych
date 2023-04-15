@@ -44,6 +44,25 @@ class Utils {
         return $url;
     }
 
+    private static function _url_maker_noclean($action, $params = null) {
+        $url = $action;
+        if (App::getConf()->clean_urls) {
+            $url .= '?';
+        }
+        if ($params != null && is_array($params)) {
+            $first = true;
+            foreach ($params as $key => $value) {
+                if ($first && App::getConf()->clean_urls){
+                    $url .= $key . '=' . $value;
+                    $first = false;
+                } else {
+                    $url .= '&' . $key . '=' . $value;
+                }
+            }
+        }
+        return $url;
+    }
+
     public static function URL($action, $params = null) {       
         return App::getConf()->action_url . self::_url_maker($action, $params);
     }
@@ -51,5 +70,30 @@ class Utils {
     public static function relURL($action, $params = null) {       
         return App::getConf()->action_root . self::_url_maker($action, $params);
     }
+
+    public static function URL_noclean($action, $params = null) {       
+        return App::getConf()->action_url . self::_url_maker_noclean($action, $params);
+    }
+
+    public static function relURL_noclean($action, $params = null) {       
+        return App::getConf()->action_root . self::_url_maker_noclean($action, $params);
+    }
+
+    public static function getIdRole($name) {
+	    $id_role = App::getDB()->select("role", "id_role", [
+	    	"name" => $name
+	    ]);
+
+	    return "$id_role";
+    }
+
+    public static function getAllCanoes() {
+        return App::getDB()->select("canoe", "*");
+    }
+
+    public static function getCanoesData($from, $to) {
+        return App::getDB()->select("canoe", "*", ['LIMIT' => [$from, $to]]);
+    }
+
 
 }
