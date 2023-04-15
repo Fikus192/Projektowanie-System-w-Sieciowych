@@ -56,7 +56,7 @@
 							</header>
 
 							<footer>
-								<a href="#contact" class="button scrolly">Przejdź do wypożyczalni</a>
+								<a href="{$conf->action_root}searchCanoe" class="button scrolly">Przejdź do wypożyczalni</a>
 							</footer>
 
 						</div>
