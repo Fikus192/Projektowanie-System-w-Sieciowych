@@ -2,6 +2,7 @@
 
 namespace app\forms;
 
-class CanoeSearchForm {
+class SearchForm {
+	public $type;
 	public $model;
 } 
