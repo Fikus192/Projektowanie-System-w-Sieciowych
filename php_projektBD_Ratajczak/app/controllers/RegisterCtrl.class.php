@@ -73,7 +73,7 @@ class RegisterCtrl {
 
         App::getDB()->insert("userrole", [
             "user_id_user" => $this->id,
-            "role_id_role" => 2,
+            "role_id_role" => 2
         ]);
 
         return !App::getMessages()->isError();
