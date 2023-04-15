@@ -13,7 +13,7 @@ use app\transfer\User;
 class LoginCtrl {
 
     private $form;
-    private $ID_User;
+    private $id_user;
 
     public function __construct() {
         //stworzenie potrzebnych obiektów
@@ -22,19 +22,25 @@ class LoginCtrl {
 
     public function validate() {
         $this->form->login = ParamUtils::getFromRequest('login');
+        $this->form->role = ParamUtils::getFromRequest('role');
         $this->form->pass = ParamUtils::getFromRequest('pass');
 
         //nie ma sensu walidować dalej, gdy brak parametrów
         if (!isset($this->form->login))
             return false;
+        if (!isset($this->form->role))
+            return false;
         if (!isset($this->form->pass))
-            return false;    
+            return false;   
+            
+        if (App::getMessages()->isError())
+            return false;
 
         // sprawdzenie, czy potrzebne wartości zostały przekazane
-        if (empty($this->form->login)) {
+        if (empty(trim($this->form->login))) {
             Utils::addErrorMessage('Nie podano loginu');
         }
-        if (empty($this->form->pass)) {
+        if (empty(trim($this->form->pass))) {
             Utils::addErrorMessage('Nie podano hasła');
         }
 
@@ -45,17 +51,17 @@ class LoginCtrl {
         // sprawdzenie, czy dane logowania poprawne
         // (takie informacje najczęściej przechowuje się w bazie danych)
         if ($this->form->login == App::getDB()->get("user","login", ["login" => $this->form->login])) {
-            if(password_verify($this->form->pass,App::getDB()->get("user","password", ["login" => $this->form->login]))){
-                $this->ID_User = App::getDB()->get("user","ID_User", ["login" => $this->form->login]);
-                $user = new User($this->form->login, $this->form->pass, $this->ID_User);
-                $role = App::getDB()->select("role", ["[><]UserRole" => ["role.ID_role" => "role_ID_Role"],
-                "[><]user" => ["UserRole.User_ID_User" => "ID_User"]],["role.name", "isActive"], ["user.login" => $this->form->login]);
+            if(password_verify($this->form->pass,App::getDB()->get("user","pass", ["login" => $this->form->login]))){
+                $this->id_user = App::getDB()->get("user","id_user", ["login" => $this->form->login]);
+                $user = new User($this->form->login, $this->id_user);
+                $role = App::getDB()->select("role", ["[><]userrole" => ["role.id_role" => "role_id_role"],
+                "[><]user" => ["userrole.user_id_user" => "id_user"]],["role.name", "isActive"], ["user.login" => $this->form->login]);
 
                 $date = date("Y-m-d h:i:s"); // aktualny czas
                 foreach($role as $r){
                     if($r["isActive"] != 0){
                         $user->add($r["name"]);
-                        App::getDB()->update("role", ["name" =>$r["name"]]);
+                        App::getDB()->update("role", ["isActive" => $date], ["name" =>$r["name"]]);
                     }
                 }
                 foreach($user->role as $u){
@@ -68,13 +74,7 @@ class LoginCtrl {
                 }
             } else {
                 Utils::addErrorMessage('Niepoprawny login lub hasło');
-            }
-
-        if ($this->form->login == "admin" && $this->form->pass == "admin") {
-                RoleUtils::addRole('admin');
-        } else {
-            Utils::addErrorMessage('Niepoprawny login lub hasło');
-        }    
+            }   
 
         return !App::getMessages()->isError();
     }
@@ -87,7 +87,8 @@ class LoginCtrl {
         if ($this->validate()) {
             //zalogowany => przekieruj na główną akcję (z przekazaniem messages przez sesję)
             Utils::addInfoMessage('Poprawnie zalogowano do systemu');
-            App::getRouter()->redirectTo("canoeList");
+            SessionUtils::storeMessages();
+            App::getRouter()->redirectTo('searchCanoe');
         } else {
             //niezalogowany => pozostań na stronie logowania
             $this->generateView();
