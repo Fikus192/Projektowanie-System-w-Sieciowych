@@ -21,5 +21,4 @@ TO DO:
 - Zaktualizowany main.tpl, CanoeEditCtrl, LoginCtrl, CanoeEdit.tpl, Utils, Config, Routing
 - Dodanie nowych widoków: Pagination.class.php, HomePage.tpl, Table.tpl
 - Zmienione nazwy ścieżek dostępowych dla: SearchCanoeCtrl, SearchForm, SearchCanoe
-
-Zmiany zostały głównie dokonane pod implementację stronnicowania w jednym widoku, w dalszych planach implementacja AJAXA
+- Zmiany zostały głównie dokonane pod implementację stronnicowania w jednym widoku, w dalszych planach implementacja AJAXA
