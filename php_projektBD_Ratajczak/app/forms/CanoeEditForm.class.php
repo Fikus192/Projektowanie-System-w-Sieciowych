@@ -6,6 +6,6 @@ class CanoeEditForm {
 	public $id;
 	public $type;
 	public $model;
-	public $productiondate;
+	public $production_date;
 	public $price;
 }
