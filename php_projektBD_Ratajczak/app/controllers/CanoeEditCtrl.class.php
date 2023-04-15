@@ -20,10 +20,10 @@ class CanoeEditCtrl {
     // Walidacja danych przed zapisem (nowe dane lub edycja).
     public function validateSave() {
         //0. Pobranie parametrów z walidacją
-        $this->form->id = ParamUtils::getFromRequest('ID_Canoe', true, 'Błędne wywołanie aplikacji');
+        $this->form->id = ParamUtils::getFromRequest('id_canoe', true, 'Błędne wywołanie aplikacji');
         $this->form->type = ParamUtils::getFromRequest('type', true, 'Błędne wywołanie aplikacji');
         $this->form->model = ParamUtils::getFromRequest('model', true, 'Błędne wywołanie aplikacji');
-        $this->form->productiondate = ParamUtils::getFromRequest('productiondate', true, 'Błędne wywołanie aplikacji');
+        $this->form->production_date = ParamUtils::getFromRequest('production_date', true, 'Błędne wywołanie aplikacji');
         $this->form->price = ParamUtils::getFromRequest('price', true, 'Błędne wywołanie aplikacji');
 
         if (App::getMessages()->isError())
@@ -36,7 +36,7 @@ class CanoeEditCtrl {
         if (empty(trim($this->form->model))) {
             Utils::addErrorMessage('Wprowadź model');
         }
-        if (empty(trim($this->form->productiondate))) {
+        if (empty(trim($this->form->production_date))) {
             Utils::addErrorMessage('Wprowadź datę produkcji');
         }
         if (empty(trim($this->form->price))) {
@@ -48,7 +48,7 @@ class CanoeEditCtrl {
 
         // 2. sprawdzenie poprawności przekazanych parametrów
 
-        $d = \DateTime::createFromFormat('Y-m-d', $this->form->productiondate);
+        $d = \DateTime::createFromFormat('Y-m-d', $this->form->production_date);
         if ($d === false) {
             Utils::addErrorMessage('Zły format daty. Przykład: 2015-12-20');
         }
@@ -75,13 +75,13 @@ class CanoeEditCtrl {
             try {
                 // 2. odczyt z bazy danych osoby o podanym ID (tylko jednego rekordu)
                 $record = App::getDB()->get("Canoe", "*", [
-                    "ID_Canoe" => $this->form->id
+                    "id_canoe" => $this->form->id
                 ]);
                 // 2.1 jeśli osoba istnieje to wpisz dane do obiektu formularza
-                $this->form->id = $record['ID_Canoe'];
+                $this->form->id = $record['id_canoe'];
                 $this->form->type = $record['type'];
                 $this->form->model = $record['model'];
-                $this->form->productiondate = $record['productiondate'];
+                $this->form->production_date = $record['production_date'];
                 $this->form->price = $record['price'];
             } catch (\PDOException $e) {
                 Utils::addErrorMessage('Wystąpił błąd podczas odczytu rekordu');
@@ -101,7 +101,7 @@ class CanoeEditCtrl {
             try {
                 // 2. usunięcie rekordu
                 App::getDB()->delete("Canoe", [
-                    "ID_Canoe" => $this->form->id
+                    "id_canoe" => $this->form->id
                 ]);
                 Utils::addInfoMessage('Pomyślnie usunięto rekord');
             } catch (\PDOException $e) {
@@ -112,7 +112,7 @@ class CanoeEditCtrl {
         }
 
         // 3. Przekierowanie na stronę listy osób
-        App::getRouter()->forwardTo('CanoeList');
+        App::getRouter()->forwardTo('searchCanoe');
     }
 
     public function action_CanoeSave() {
@@ -130,7 +130,7 @@ class CanoeEditCtrl {
                         App::getDB()->insert("Canoe", [
                             "type" => $this->form->type,
                             "model" => $this->form->model,
-                            "productiondate" => $this->form->productiondate,
+                            "production_date" => $this->form->production_date,
                             "price" => $this->form->price
                         ]);
                     } else { //za dużo rekordów
@@ -144,10 +144,10 @@ class CanoeEditCtrl {
                     App::getDB()->update("Canoe", [
                         "type" => $this->form->type,
                         "model" => $this->form->model,
-                        "productiondate" => $this->form->productiondate,
+                        "production_date" => $this->form->production_date,
                         "price" => $this->form->price
                             ], [
-                        "ID_Canoe" => $this->form->id
+                        "id_canoe" => $this->form->id
                     ]);
                 }
                 Utils::addInfoMessage('Pomyślnie zapisano rekord');
@@ -158,7 +158,7 @@ class CanoeEditCtrl {
             }
 
             // 3b. Po zapisie przejdź na stronę listy osób (w ramach tego samego żądania http)
-            App::getRouter()->forwardTo('CanoeList');
+            App::getRouter()->forwardTo('searchCanoe');
         } else {
             // 3c. Gdy błąd walidacji to pozostań na stronie
             $this->generateView();
