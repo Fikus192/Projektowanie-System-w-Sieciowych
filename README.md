@@ -4,10 +4,10 @@
 TO DO:
 - Nowy schemat struktury systemu uwzględniający warstwy DAO oraz serwisy ✅
 - Implementacja stronicowania rezultatów w widoku z wyszukiwaniem (implementacja na jednym widoku) - rozszerzenie poprzedniego systemu ✅
-- AJAX (implementacja na jednym widoku) - rozszerzenie poprzedniego systemu
-- Witryna na CMS uwzględniająca wbudowane szablony widoku (po instalacji i dodaniu treści)
-- Dostosowanie nowego szablonu HTML (szablon strony + szablon menu)
-- Aktualności i galeria
+- AJAX (implementacja na jednym widoku) - rozszerzenie poprzedniego systemu ✅
+- Witryna na CMS uwzględniająca wbudowane szablony widoku (po instalacji i dodaniu treści) ✅
+- Dostosowanie nowego szablonu HTML (szablon strony + szablon menu) ✅
+- Aktualności i galeria ✅
 
 28.03.2023r.
 - Zaktualizowany schemat struktry systemu
@@ -22,3 +22,6 @@ TO DO:
 - Dodanie nowych widoków: Pagination.class.php, HomePage.tpl, Table.tpl
 - Zmienione nazwy ścieżek dostępowych dla: SearchCanoeCtrl, SearchForm, SearchCanoe
 - Zmiany zostały głównie dokonane pod implementację stronnicowania w jednym widoku, w dalszych planach implementacja AJAXA
+
+28.05.2023r.
+- Wrzucony pełny CMS do GitHuba
