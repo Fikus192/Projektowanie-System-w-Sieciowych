@@ -64,11 +64,11 @@ class RegisterCtrl {
             "login" => $this->form->login,
             "pass" => $hashed_pass,
             "email" => $this->form->email,
-            "phone_number" => $this->form->phone_number,
+            "phone_number" => $this->form->phone_number
         ]);
 
         $this->id = App::getDB()->get("user", "id_user",[
-            "login" => $this->form->login,
+            "login" => $this->form->login
         ]);
 
         App::getDB()->insert("userrole", [
