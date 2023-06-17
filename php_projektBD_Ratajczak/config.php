@@ -1,11 +1,10 @@
 <?php
 $conf->debug = true; # set true during development and use in your code (for instance check if true to send additional message)
 
-# ---- Main webapp configuration
+# ---- Webapp location
 $conf->server_name = 'localhost';   # server address and port
 $conf->protocol = 'http';           # http or https
-$conf->app_root = '/php_projektBD_Ratajczak/public'; # project subfolder in domain (relative to main domain)
-$conf->projectDir = '/php_projektBD_Ratajczak';
+$conf->app_root = '/Projektowanie-Systemow-Sieciowych/php_projektBD_Ratajczak/public';   # project subfolder in domain (relative to main domain)
 
 # ---- Database config - values required by Medoo
 $conf->db_type = 'mysql';

@@ -1,26 +1,11 @@
-<div class="messages">
-
-{if $msgs->isError()}
-<div class="err">
-	<ol>
-	{foreach $msgs->getErrors() as $err}
-	{strip}
-		<li>{$err}</li>
-	{/strip}
-	{/foreach}
-	</ol>
-</div>
+{if $msgs->isMessage()}
+    <div class="messages bottom-margin">
+        <ul>
+        {foreach $msgs->getMessages() as $msg}
+        {strip}
+            <li class="msg {if $msg->isError()}error bottom-margin{/if} {if $msg->isWarning()}info bottom-margin{/if} {if $msg->isInfo()}info bottom-margin{/if}">{$msg->text}</li>
+        {/strip}
+        {/foreach}
+        </ul>
+    </div>
 {/if}
-{if $msgs->isInfo()}
-<div class="inf">
-	<ol>
-	{foreach $msgs->getInfos() as $inf}
-	{strip}
-		<li>{$inf}</li>
-	{/strip}
-	{/foreach}
-	</ol>
-</div>
-{/if}
-
-</div>

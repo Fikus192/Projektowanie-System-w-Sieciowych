@@ -37,11 +37,18 @@ class ParamUtils {
     }
 
     public static function getFromCookies($param_name, $required = false, $required_message = null, $index = null) {
-        return self::getFrom($_COOKIES, $param_name, $required, $required_message, $index);
+        return self::getFrom($_COOKIE, $param_name, $required, $required_message, $index);
     }
 
     public static function getFromSession($param_name, $required = false, $required_message = null, $index = null) {
         return self::getFrom($_SESSION, $param_name, $required, $required_message, $index);
     }
 
+    public static function getParamsForFiltering($searchForm)
+    {
+        $searchForm->selectedType = ParamUtils::getFromRequest('typeSelect');
+        $searchForm->selectedModel = ParamUtils::getFromRequest('modelSelect');
+        $searchForm->selectedProductionDate = ParamUtils::getFromRequest('productionDateSelect');
+        $searchForm->selectedPrice = ParamUtils::getFromRequest('priceSelect');
+    }
 }

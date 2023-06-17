@@ -3,6 +3,13 @@
 namespace app\forms;
 
 class SearchForm {
-	public $type;
-	public $model;
+	public $typesData;
+	public $modelsData;
+	public $productionDatesData;
+	public $pricesData;
+
+	public $selectedType;
+    public $selectedModel;
+    public $selectedProductionDate;
+	public $selectedPrice;
 } 

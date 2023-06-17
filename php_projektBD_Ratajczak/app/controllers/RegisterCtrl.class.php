@@ -4,97 +4,112 @@ namespace app\controllers;
 
 use core\App;
 use core\Utils;
-use core\RoleUtils;
 use core\ParamUtils;
 use core\SessionUtils;
 use app\forms\RegisterForm;
-use app\transfer\User;
 
 class RegisterCtrl {
 
     private $form;
-    private $id;
 
     public function __construct() {
         //stworzenie potrzebnych obiektów
         $this->form = new RegisterForm();
     }
 
-    public function validate() {
+    public function getParams()
+    {
         $this->form->login = ParamUtils::getFromRequest('login');
         $this->form->pass = ParamUtils::getFromRequest('pass');
         $this->form->repeat_pass = ParamUtils::getFromRequest('repeat_pass');
         $this->form->email = ParamUtils::getFromRequest('email');
         $this->form->phone_number = ParamUtils::getFromRequest('phone_number');
+    }
 
-        //nie ma sensu walidować dalej, gdy brak parametrów
-        if (!isset($this->form->login))
-            return false;
+    public function validate() {
 
-        // sprawdzenie, czy potrzebne wartości zostały przekazane
-        if (empty(trim($this->form->login))) {
-            Utils::addErrorMessage('Nie podano loginu');
-        }
-        if (empty(trim($this->form->pass))) {
-            Utils::addErrorMessage('Nie podano hasła');
-        }
-        if (empty(trim($this->form->repeat_pass))) {
-            Utils::addErrorMessage('Nie potwierdzono hasła');
-        }
-        if (empty(trim($this->form->email))) {
-            Utils::addErrorMessage('Nie podano maila');
-        }
-        if (empty(trim($this->form->phone_number))) {
-            Utils::addErrorMessage('Nie podano numeru telefonu');
-        }
-        if ($this->form->pass != $this->form->repeat_pass) {
-            Utils::addErrorMessage('Hasła nie są takie same, spróbuj jeszcze raz');
-        }
-        if (App::getDB()->has("user", ["login" => $this->form->login])) {
-            Utils::addErrorMessage('Użytkownik istnieje już w bazie');
+        $loginValid = Utils::isLoginValid($this->form->login);
+        $emailValid = Utils::isEmailValid($this->form->email);
+
+        $isUnique = $this->isUniqueInDB();
+        if(!$isUnique)
+        {
+			Utils::addErrorMessage('Login albo e-mail istnieją w bazie danych.');
         }
 
-        //nie ma sensu walidować dalej, gdy brak wartości
-        if (App::getMessages()->isError())
-            return false;
+        $passwordsTheSame = (strcmp($this->form->pass, $this->form->repeat_pass) === 0);
+        $passFirstValid = null;
+        if($passwordsTheSame)
+        {
+            $passFirstValid = Utils::isPasswordValid($this->form->pass);
+        }
+        else
+        {
+            Utils::addErrorMessage('Hasła nie są takie same.');
+        }
 
-        $hashed_pass = password_hash($this->form->pass, PASSWORD_DEFAULT);
+        $phoneNumberValid = Utils::isPhoneNumberValid($this->form->phone_number);
+		
+		return ($loginValid && $passFirstValid && $passwordsTheSame && $emailValid && $phoneNumberValid && $isUnique);
+    }
 
-        App::getDB()->insert("user",[
+    private function isUniqueInDB()
+    {
+        $loginData = App::getDB()->select("user", "id_user", [
+            "login" => $this->form->login
+        ]);
+
+        $emailData = App::getDB()->select("user", "id_user", [
+            "email" => $this->form->email
+        ]);
+
+        return (empty($loginData) && empty($emailData));
+    }
+
+    private function insertToDB()
+    {
+
+        App::getDB()->insert("user", [
             "login" => $this->form->login,
-            "pass" => $hashed_pass,
+            "pass" => $this->form->pass,
             "email" => $this->form->email,
             "phone_number" => $this->form->phone_number
         ]);
 
-        $this->id = App::getDB()->get("user", "id_user",[
-            "login" => $this->form->login
-        ]);
-
         App::getDB()->insert("userrole", [
-            "user_id_user" => $this->id,
-            "role_id_role" => 2
+            "user_id_user" => App::getDB()->id(),
+            "role_id_role" => Utils::getIdRole("user")
         ]);
+	}
 
-        return !App::getMessages()->isError();
-    }
+    public function action_register() 
+    {
+        $this->getParams();
 
-    public function action_register() {
-        if ($this->validate()) {
+        if ($this->validate()) 
+        {
             //zalogowany => przekieruj na główną akcję (z przekazaniem messages przez sesję)
+            $this->insertToDB();
             Utils::addInfoMessage('Poprawnie zarejestrowano się do systemu');
             SessionUtils::storeMessages();
-            App::getRouter()->redirectTo("login");
-        } else {
+            App::getRouter()->forwardTo("homePage");
+        } 
+        else 
+        {
             //niezarejestrowany => pozostań na stronie rejestracji
             $this->generateView();
         }
     }
 
+    public function action_registerShow()
+    {
+		$this->generateView();
+	}
+
     public function generateView() {
-        App::getSmarty()->assign('page_title','Wypożyczalnia kajaków');
+        App::getSmarty()->assign('page_title','Rejestracja');
         App::getSmarty()->assign('page_description','System do zarządzania kajakami');
-     //   App::getSmarty()->assign('form', $this->form);	
+        App::getSmarty()->assign('form', $this->form);	
         App::getSmarty()->display('RegisterView.tpl');
     }
 
